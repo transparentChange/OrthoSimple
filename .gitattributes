@@ -1,2 +1,2 @@
-linguist-vendored
-.rkt linguist-vendored=false
+*linguist-vendored
+*.rkt linguist-vendored=false
