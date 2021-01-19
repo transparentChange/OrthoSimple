@@ -1,2 +1,1 @@
-*linguist-vendored
-*.rkt linguist-detectable=false
+orthosimple/recognizer/* linguist-vendored
