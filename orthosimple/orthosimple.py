@@ -46,7 +46,6 @@ class OrthoSimple(tk.Tk):
         self.mainloop()
     
     def quit(self):
-        print("here")
         self.gui_socket.close()
         self.destroy()
         

@@ -1,9 +1,3 @@
-'''
-Created on Jan 9, 2021
-
-@author: proizvol
-'''
-
 import sqlalchemy as db
 import pandas as pd
 
