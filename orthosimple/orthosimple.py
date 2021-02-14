@@ -1,8 +1,13 @@
 import tkinter as tk
 
+import sys
 import threading
 import time
 import socket
+
+from pynput import keyboard
+import subprocess
+from tempfile import TemporaryFile
 
 import association_reader
 import language_inputs
@@ -29,7 +34,12 @@ class OrthoSimple(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", quit)
 
         self.dbReader = association_reader.Reader()
-        self.key_listener = language_inputs.KeyboardListener(language_inputs.FrenchInput(self.dbReader))
+        self.key_listener = language_inputs.KeyboardListener(
+            language_inputs.LanguageInput(self.DEFAULT_LANGUAGE, self.dbReader))
+        
+        if (sys.platform == "linux"):
+            window_map_listener = keyboard.Listener(on_press = self.toggle_visibility, on_release = None)
+            window_map_listener.start()
         
         self.resizable(False, False)
         self.configure(background = "white")
@@ -44,6 +54,23 @@ class OrthoSimple(tk.Tk):
         self.grid_columnconfigure(0, weight = 1)
         
         self.mainloop()
+    
+    def toggle_visibility(self, key_typed):
+        """
+        This function toggles the visibility of the main program using xdotool
+        """
+        if (key_typed == keyboard.Key.esc):
+            with TemporaryFile() as wid_file:
+                wid_process = subprocess.Popen(["xdotool", "search", "--name", "tk"], stdout = wid_file);
+                wid_process.wait()
+                wid_file.flush()
+                wid_file.seek(0)
+                active_window_process = subprocess.Popen(["xdotool", "search", "--onlyvisible", "--name", "tk"],
+                                                         stdout = subprocess.PIPE)
+                if (active_window_process.stdout.read() != b""):
+                    subprocess.call(["xdotool", "windowunmap", wid_file.read()])
+                else:
+                    subprocess.call(["xdotool", "windowmap", wid_file.read()])
     
     def quit(self):
         self.gui_socket.close()
@@ -140,8 +167,8 @@ class OptionsFrame(tk.Frame):
         
         menu = tk.Menu(self.info_container)
         menu_font = ("TkDefaultFont", 9)
-        menu.add_command(label = "Settings", command = self.change_frame, font = menu_font)
-        menu.add_command(label = "Keybindings", command = self.change_frame, font = menu_font)
+        menu.add_command(label = "Settings", command = self.to_settings, font = menu_font)
+        menu.add_command(label = "Keybindings", command = self.to_information, font = menu_font)
         controller.configure(menu = menu)
         
         
@@ -156,7 +183,19 @@ class OptionsFrame(tk.Frame):
         self.grid_rowconfigure(1, weight = 0, minsize = OrthoSimple.DIM 
                                - OrthoSimple.HEIGHT_ROW0) #?
         self.grid_columnconfigure(0, weight = 1)
+    
+    def to_settings(self):
+        if (type(self.curr_frame) is OptionsFrame.InformationKeys):
+            self.curr_frame.destroy()
+            self.curr_frame = OptionsFrame.Settings(self.info_container, self.controller)
+            self.curr_frame.grid()
         
+    def to_information(self):
+        if (type(self.curr_frame) is OptionsFrame.Settings):
+            self.curr_frame.destroy()
+            self.curr_frame = OptionsFrame.InformationKeys(self.info_container)
+            self.curr_frame.grid()
+
     def change_frame(self):
         self.curr_frame.destroy()
         if (type(self.curr_frame) is OptionsFrame.Settings):
@@ -199,7 +238,7 @@ class OptionsFrame(tk.Frame):
             self.configure(background = "white")
             
             self.bindings = dict({})
-            info_file = open("text_association", "r")
+            info_file = open("text_association.txt", "r")
             association_info = info_file.read().split("\n\n")
             for line in association_info:
                 lang_association = line.split("\n")

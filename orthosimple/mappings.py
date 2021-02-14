@@ -19,7 +19,6 @@ class Mapping:
         self.mapCondition = mapCondition
         self.map = dict([])
         
-        
         for (charOrig, charNew) in zip(plainText, newText):
             self.map[keyboard.KeyCode(char = charOrig)] = charNew
         self.sequences = seq
@@ -35,38 +34,42 @@ class Mapping:
         for i in range(0, len(self.sequences)):
             self.indicesSeq[i] = 0
     
-    def writeNewChar(self, charTyped):
-        if ((self.prev_transformed is not None) and (str(charTyped) == "Key.backspace") and 
+    def writeNewChar(self, key_typed):
+        if ((self.prev_transformed is not None) and (str(key_typed) == "Key.backspace") and 
             (str(self.prevKey) == "'v'")):
             pyperclip.copy(self.prev_transformed)
             pyautogui.hotkey("ctrl", "v") # pasting avoids recursive calls
             self.prev_transformed = None
         
-        if (str(charTyped) == 'Key.caps_lock'): # temporary implementation
+        if (str(key_typed) == 'Key.caps_lock'): # temporary implementation
             self.capsLockOn = not self.capsLockOn
             return
         
-        if (str(charTyped) == "Key.shift"):
+        if (str(key_typed) == "Key.shift"):
             self.shift_pressed = True
         
-        typedStr = str(charTyped)
-        if (self.capsLockOn and len(typedStr) == 3):
-            typedStr = typedStr[1].upper()
-            charTyped = keyboard.KeyCode(char = typedStr)
+        typed_str = str(key_typed)
+        letter_typed = ""
+        if ((len(typed_str) == 3) or (typed_str == "'\\\\'")):
+            letter_typed = typed_str[1]
+            
+        if (self.capsLockOn and (letter_typed != "")):
+            typed_str = typed_str[1].upper()
+            key_typed = keyboard.KeyCode(char = typed_str)
            
-        newIndices = self.__getNewIndices(charTyped)
+        newIndices = self.__getNewIndices(key_typed)
         if (isinstance(newIndices, int) or (newIndices == dict())):
             self.__initIndices()
         else:
             self.indicesSeq = newIndices
-        
-        if ((self.mapCondition(charTyped, self.prevKey)) and (charTyped in self.map)):
+         
+        if ((self.mapCondition(letter_typed, self.prevKey)) and (key_typed in self.map)):
             pyautogui.press('backspace')
             pyautogui.press('backspace')
             
-            if (str(charTyped)[1] in Mapping.MANUAL_CHARS):
+            if (letter_typed in Mapping.MANUAL_CHARS):
                 pyautogui.PAUSE = 0
-                hexNum = hex(ord(self.map[charTyped]))
+                hexNum = hex(ord(self.map[key_typed]))
                 
                 pyautogui.hotkey('ctrl', 'shift', 'u')
                 for digit in hexNum:
@@ -74,12 +77,12 @@ class Mapping:
                 pyautogui.typewrite('\n')
                 pyautogui.PAUSE = 0.05
             else: 
-                pyperclip.copy(self.map[charTyped]) 
+                pyperclip.copy(self.map[key_typed]) 
                 pyautogui.hotkey("ctrl", "v")
             
-            self.prev_transformed = str(self.prevKey)[1] + str(charTyped)[1]
+            self.prev_transformed = self.prevKey + letter_typed
             
-        self.__updatePrevKey(charTyped)
+        self.__updatePrevKey(letter_typed)
     
     def on_release(self, key_released):
         if (str(key_released) == "Key.shift"):
