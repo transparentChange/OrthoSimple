@@ -1,6 +1,9 @@
 import sqlalchemy as db
 import pandas as pd
 import numpy as np
+from pathlib import Path
+
+data_folder = Path.cwd().parent / "src_data"
 
 class LanguageReader:
     """
@@ -9,7 +12,7 @@ class LanguageReader:
     """
     
     def __init__(self):
-        self.language_names = pd.read_csv("languages.csv")
+        self.language_names = pd.read_csv(data_folder / "languages.csv")
         self.language_map = dict({})
         for i in self.language_names.index:
             self.language_map[self.language_names.iloc[i, 0]] = self.language_names.iloc[i, 1]
@@ -45,7 +48,7 @@ class AssociationReader:
         
         AssociationReader.plain = "input_char"
         AssociationReader.new = "new_char" 
-        self.df_associations = pd.read_csv("associations.csv")
+        self.df_associations = pd.read_csv(data_folder / "associations.csv")
         
         unique_groups = self.df_associations.drop_duplicates(subset = ["special_group", "language_abbrev"])
         groups_col = unique_groups["special_group"]
@@ -57,7 +60,7 @@ class AssociationReader:
             else:
                 self.language_groups[language] = [item]  
 
-        self.keys_from_groups = pd.read_csv("keybindings.csv")  
+        self.keys_from_groups = pd.read_csv(data_folder / "keybindings.csv")  
         self.summary_bindings()
         
     def get_binding(self, special_group):
