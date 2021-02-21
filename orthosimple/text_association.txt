@@ -2,22 +2,45 @@ French
 (common)
 /  +  e  ⇒  é
 \  +  e  ⇒  è
-e  +  e  ⇒  ê
 "  +  e  ⇒  ë
+,  +  c  ⇒  ç
+o  +  e  ⇒  œ
 (also)
-;  +  c  ⇒  ç
 .  +  <  ⇒  «
 .  +  >  ⇒  »
 .  +  c  ⇒  €
 
 Spanish
 (common)
-\  +  a  ⇒  à
+/  +  u  ⇒  ú
 "  +  u  ⇒  ü
 ;  +  n  ⇒  ñ
 (also)
+.  +  ?  ⇒  ¿
+.  +  !  ⇒  ¡
 .  +  <  ⇒  «
 .  +  >  ⇒  »
 .  +  c  ⇒  €
-.  +  ?  ⇒  ¿
-.  +  !  ⇒  ¡
+
+Polish
+(common)
+/  +  z  ⇒  ź
+,  +  a  ⇒  ą
+,  +  e  ⇒  ę
+;  +  l  ⇒  ł
+;  +  z  ⇒  ż
+
+Turkish
+(common)
+"  +  o  ⇒  ö
+,  +  c  ⇒  ç
+,  +  s  ⇒  ş
+;  +  g  ⇒  ğ
+;  +  i  ⇒  ı
+
+Swedish
+(common)
+/  +  e  ⇒  é
+"  +  a  ⇒  ä
+;  +  a  ⇒  å
+

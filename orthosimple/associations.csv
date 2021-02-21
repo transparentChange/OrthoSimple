@@ -25,11 +25,11 @@
 24,u,ú,SP,acute
 25,u,ü,SP,trema
 26,n,ñ,SP,special
-27,<,«,SP,other
-28,>,»,SP,other
-29,c,€,SP,other
-30,?,¿,SP,other
-31,!,¡,SP,other
+27,?,¿,SP,other
+28,!,¡,SP,other
+29,<,«,SP,other
+30,>,»,SP,other
+31,c,€,SP,other
 32,c,ć,PO,acute
 33,n,ń,PO,acute
 34,o,ó,PO,acute

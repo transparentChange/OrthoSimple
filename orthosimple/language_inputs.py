@@ -10,21 +10,14 @@ class KeyboardListener:
                                               on_release = None)
         self.key_listener.start()
     
-    def update_language(self, new_language):
-        self.language = new_language
+    def update_language(self, language_input):
+        self.language = language_input
+    
+    def get_language(self):
+        return self.language.language
         
 class LanguageInput:
     def __init__(self, language_abbrev, association_reader):
-        # functions associated with escape characters
-        LanguageInput.GRAVE_COND = self.default_mapping('\\')
-        LanguageInput.ACUTE_COND = self.default_mapping('/')
-        LanguageInput.TREMA_COND = self.default_mapping('"')
-        LanguageInput.SUB_CURL_COND = self.default_mapping(',')
-        LanguageInput.SPECIAL_COND = self.default_mapping(';')
-        LanguageInput.OTHER_COND = self.default_mapping('.')
-        LanguageInput.OE_COND = self.default_mapping('o')
-        LanguageInput.AE_COND = self.default_mapping('a')
-        
         self.mappings = []
         self.language = language_abbrev
         self.association_reader = association_reader
@@ -35,35 +28,20 @@ class LanguageInput:
         """
         Appends all of the mappings for the language, based on the default
         keystrokes for the special groups, to the mappings field via add_mapping
-        """
+        """ 
         
         groups = self.association_reader.get_groups(self.language)
         for special_group in groups:
             if (special_group == "circumflex"):
                 map_condition = lambda curr, prev: curr == prev; 
-            elif (special_group == "acute"):
-                map_condition = LanguageInput.ACUTE_COND
-            elif (special_group == "grave"):
-                map_condition = LanguageInput.GRAVE_COND
-            elif (special_group == "trema"):
-                map_condition = LanguageInput.TREMA_COND
-            elif (special_group == "sub_curl"):
-                map_condition = LanguageInput.SUB_CURL_COND
-            elif (special_group == "special"):
-                map_condition = LanguageInput.SPECIAL_COND
-            elif (special_group == "other"):
-                map_condition = LanguageInput.OTHER_COND
-            elif (special_group == "oe"):
-                map_condition = LanguageInput.OE_COND;
-            elif (special_group == "ae"):
-                map_condition = LanguageInput.AE_COND;
-            
+            else:
+                map_condition = self.default_mapping(self.association_reader.get_binding(special_group))
             self.add_mapping(map_condition, special_group, self.language)
             
     def add_mapping(self, map_condition, group, language_abbrev):
         char_association = self.association_reader.select_char_association(group, language_abbrev)
-        self.mappings.append(mappings.Mapping(map_condition, char_association[0],
-                                              char_association[1]))
+        self.mappings.append(mappings.Mapping(map_condition, char_association.iloc[:,0],
+                                              char_association.iloc[:,1]))
  
     def default_mapping(self, prev_to_match):
         return lambda curr, prev : prev == prev_to_match
